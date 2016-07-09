@@ -32,7 +32,7 @@ def get_100_pdfs(prefix, pin_count, offset=0):
                         break
             if url is not None:
                 uid = part['uid']
-                path = 'data/{}/pdfs/{}/{}.pdf'.format(prefix, pin_count, uid)
+                path = 'data/{}/{}/{}.pdf'.format(prefix, pin_count, uid)
                 if not os.path.exists(path):
                     data = urllib.urlopen(url).read()
                     with open(path, 'w') as outfile:
@@ -44,7 +44,7 @@ def get_100_pdfs(prefix, pin_count, offset=0):
 
 def get_pdfs(prefix, pin_count, n=1):
     uids = []
-    utils.makedir('data/{}/pdfs/{}'.format(prefix, pin_count))
+    utils.makedir('data/{}/{}'.format(prefix, pin_count))
     for i in range(0, n):
         uids.extend(get_100_pdfs(prefix, pin_count, i))
         time.sleep(0.33)
