@@ -1,2 +1,2 @@
 sleep 1
-scrot -s "./$(xdotool getactivewindow getwindowname).png"
+scrot -s "./$(xdotool getwindowfocus getwindowname).png"
