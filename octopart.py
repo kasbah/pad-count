@@ -1,5 +1,6 @@
 import json
 import urllib
+import os
 
 from apikey import apikey
 
@@ -17,4 +18,6 @@ for result in response['results']:
     part = result['item']
     sheets = part['datasheets']
     if len(sheets) > 0:
-        print sheets[0]['url']
+        url = sheets[0]['url']
+        if os.path.splitext(url)[-1] == '.pdf':
+            print url
