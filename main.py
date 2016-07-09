@@ -22,7 +22,7 @@ def run(pin_count):
     for uid in uids:
         image_folder = 'data/training/{}'.format(pin_count)
         rejected_uids_folder = 'data/rejected/uids/{}'.format(pin_count)
-        rejected_sha_folder = 'data/rejected/sha/{}'.format(pin_count)
+        rejected_sha_folder = 'data/rejected/sha/'
         utils.makedir(image_folder)
         utils.makedir(rejected_uids_folder)
         utils.makedir(rejected_sha_folder)
@@ -31,6 +31,7 @@ def run(pin_count):
         rejected_uid_path = '{}/{}'.format(rejected_uids_folder, uid)
 
         if os.path.exists(output_path) or os.path.exists(rejected_uid_path):
+            print('ignoring rejected uid {}'.format(uid))
             continue
 
         pdf_path = 'data/pdfs/{}/{}.pdf'.format(pin_count, uid)
@@ -39,6 +40,7 @@ def run(pin_count):
         rejected_sha_path = '{}/{}'.format(rejected_sha_folder, sha)
 
         if os.path.exists(rejected_sha_path):
+            print('ignoring rejected sha1 {}'.format(sha))
             continue
 
         evince = sp.Popen(['evince', pdf_path], stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -51,16 +53,16 @@ def run(pin_count):
         if c == 's':
             #take a screenshot with imagemagick's import
             sp.check_call(['import', output_path])
-        elif c == 'r':
-            pass
         elif c == 'e':
             evince.kill()
             print("")
             sys.exit(0)
-        elif c == 'n':
-            sp.check_call(['touch', '{}/{}'.format(rejected_sha_folder, sha)])
-        else:
+        elif c == 'r':
+            print('rejecting uid: {}'.format(uid))
             sp.check_call(['touch', rejected_uid_path])
+        else:
+            print('rejecting sha1: {}'.format(sha))
+            sp.check_call(['touch', '{}/{}'.format(rejected_sha_folder, sha)])
         evince.kill()
 
 run(4)
