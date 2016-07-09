@@ -4,29 +4,37 @@ import os
 
 from apikey import apikey
 
-url = 'http://octopart.com/api/v3/parts/search?'
-url += '&q=SOIC'
-url += '&limit=100'
-url += '&apikey={}'.format(apikey)
-url += '&include[]=datasheets'
-url += '&include[]=specs'
+def makedir(p):
+    if not os.path.exists(p):
+        os.makedirs(p)
 
-data = urllib.urlopen(url).read()
-response = json.loads(data)
+def get_pdfs(pin_count, offset=0):
+    makedir('pdfs/{}'.format(pin_count))
+    url = 'https://octopart.com/api/v3/parts/search?'
+    url += '&q='
+    url += '&filter[fields][specs.pin_count.value][]={}'.format(pin_count)
+    url += '&start={}'.format(offset * 100)
+    url += '&limit=100'
+    url += '&apikey={}'.format(apikey)
+    url += '&include[]=datasheets'
+    url += '&include[]=specs'
 
-# print mpn's
-for result in response['results']:
-    part = result['item']
-    sheets = part['datasheets']
-    if len(sheets) > 0:
-        url = None
-        for sheet in sheets:
-            if 'url' in sheet:
-                if os.path.splitext(sheet['url'])[-1] == '.pdf':
-                    url = sheet['url']
-                    break
-        if url is not None:
-            specs = part['specs']
-            if 'pin_count' in specs:
-                n_pins = specs['pin_count']['display_value']
-                print n_pins
+    data = urllib.urlopen(url).read()
+    response = json.loads(data)
+
+    uids = []
+    for result in response['results']:
+        part = result['item']
+        sheets = part['datasheets']
+        if len(sheets) > 0:
+            url = None
+            for sheet in sheets:
+                if 'url' in sheet:
+                    if os.path.splitext(sheet['url'])[-1] == '.pdf':
+                        url = sheet['url']
+                        break
+            if url is not None:
+                uid = part['uid']
+
+
+get_pdfs(2)
