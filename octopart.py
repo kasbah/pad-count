@@ -1,6 +1,7 @@
 import json
 import urllib
 import os
+import time
 
 from apikey import apikey
 
@@ -8,8 +9,7 @@ def makedir(p):
     if not os.path.exists(p):
         os.makedirs(p)
 
-def get_pdfs(pin_count, offset=0):
-    makedir('pdfs/{}'.format(pin_count))
+def get_100_pdfs(prefix, pin_count, offset=0):
     url = 'https://octopart.com/api/v3/parts/search?'
     url += '&q='
     url += '&filter[fields][specs.pin_count.value][]={}'.format(pin_count)
@@ -22,7 +22,6 @@ def get_pdfs(pin_count, offset=0):
     data = urllib.urlopen(url).read()
     response = json.loads(data)
 
-    uids = []
     for result in response['results']:
         part = result['item']
         sheets = part['datasheets']
@@ -35,6 +34,16 @@ def get_pdfs(pin_count, offset=0):
                         break
             if url is not None:
                 uid = part['uid']
+                data = urllib.urlopen(url).read()
+                path = '{}/pdfs/{}/{}.pdf'.format(prefix, pin_count, uid)
+                with open(path, 'w') as outfile:
+                    outfile.write(data)
 
 
-get_pdfs(2)
+def get_pdfs(prefix, pin_count):
+    makedir('{}/pdfs/{}'.format(prefix, pin_count))
+    for i in range(0, 50):
+        get_100_pdfs(prefix, pin_count, i)
+        time.sleep(0.33)
+
+get_pdfs('data/training', 2)
