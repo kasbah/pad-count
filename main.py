@@ -17,9 +17,12 @@ if os.path.exists('data'):
 else:
     uids = octopart.get_pdfs('training', 4)
 
-for uid in uids[:2]:
+for uid in uids[:10]:
     image_folder = 'data/training/images/4'
     utils.makedir(image_folder)
-    subprocess.Popen(['scrot', '-s', '{}/{}.png'.format(image_folder, uid)])
-    subprocess.check_output(['evince', 'data/training/pdfs/4/{}.pdf'.format(uid)])
-    time.sleep(0.1)
+    evince = subprocess.Popen(['evince', 'data/training/pdfs/4/{}.pdf'.format(uid)])
+    c = raw_input("> ")
+    if c == 's':
+        subprocess.check_call(['import', '{}/{}.png'.format(image_folder, uid)])
+    print("")
+    evince.kill()
