@@ -1,6 +1,7 @@
 import subprocess as sp
 import time
 import os
+import sys
 
 import utils
 import octopart
@@ -19,7 +20,7 @@ else:
 
 for uid in uids:
     image_folder = 'data/training/4'
-    rejected_folder = 'data/rejected'
+    rejected_folder = 'data/rejected/uids/4'
     utils.makedir(image_folder)
     utils.makedir(rejected_folder)
 
@@ -29,11 +30,22 @@ for uid in uids:
     if os.path.exists(output_path) or os.path.exists(rejected_path):
         continue
 
-    evince = sp.Popen(['evince', 'data/pdfs/4/{}.pdf'.format(uid)], stdout=sp.PIPE, stderr=sp.STDOUT)
+    evince = sp.Popen(['evince', 'data/pdfs/4/{}.pdf'.format(uid)], stdout=sp.PIPE)
 
-    c = raw_input('{}> '.format(uid))
+    try:
+        c = raw_input('{}> '.format(uid))
+    except EOFError:
+        c = 'e'
+
     if c == 's':
+        #take a screenshot with imagemagick
         sp.check_call(['import', output_path])
+    elif c == 'r':
+        pass
+    elif c == 'e':
+        evince.kill()
+        print("")
+        sys.exit(0)
     else:
         sp.check_call(['touch', rejected_path])
 
