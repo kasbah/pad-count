@@ -9,6 +9,7 @@ url += '&q=SOIC'
 url += '&limit=100'
 url += '&apikey={}'.format(apikey)
 url += '&include[]=datasheets'
+url += '&include[]=specs'
 
 data = urllib.urlopen(url).read()
 response = json.loads(data)
@@ -18,6 +19,14 @@ for result in response['results']:
     part = result['item']
     sheets = part['datasheets']
     if len(sheets) > 0:
-        url = sheets[0]['url']
-        if os.path.splitext(url)[-1] == '.pdf':
-            print url
+        url = None
+        for sheet in sheets:
+            if 'url' in sheet:
+                if os.path.splitext(sheet['url'])[-1] == '.pdf':
+                    url = sheet['url']
+                    break
+        if url is not None:
+            specs = part['specs']
+            if 'pin_count' in specs:
+                n_pins = specs['pin_count']['display_value']
+                print n_pins
