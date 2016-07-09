@@ -1,4 +1,4 @@
-import subprocess
+import subprocess as sp
 import time
 import os
 
@@ -29,13 +29,12 @@ for uid in uids:
     if os.path.exists(output_path) or os.path.exists(rejected_path):
         continue
 
-    evince = subprocess.Popen(['evince', 'data/pdfs/4/{}.pdf'.format(uid)])
+    evince = sp.Popen(['evince', 'data/pdfs/4/{}.pdf'.format(uid)], stdout=sp.PIPE, stderr=sp.STDOUT)
 
     c = raw_input('{}> '.format(uid))
     if c == 's':
-        subprocess.check_call(['import', output_path])
+        sp.check_call(['import', output_path])
     else:
-        subprocess.check_call(['touch', rejected_path])
-    print("")
+        sp.check_call(['touch', rejected_path])
 
     evince.kill()
