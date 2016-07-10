@@ -37,7 +37,7 @@ def get_100_pdfs(prefix, pin_count, offset=0):
                     data = urllib.urlopen(url).read()
                     with open(path, 'w') as outfile:
                         outfile.write(data)
-                paths.append(path)
+                paths.append({'mpn': part['mpn'], 'path': path})
     return paths
 
 

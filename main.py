@@ -37,37 +37,34 @@ def uid_to_image(pin_count, uid):
     return 'data/training/{}/{}.png'.format(pin_count, uid)
 
 
-def get_valid(pin_count, paths):
+def get_valid(pin_count, parts):
     valid = []
-    for path in paths:
+    for obj in parts:
+        path = obj['path']
         uid = path_to_uid(path)
         if not os.path.exists(uid_to_image(pin_count, uid)):
             sha = sp.check_output(['sha1sum', path]).split(' ')[0]
             if (sha not in rejected[pin_count]) and (sha not in rejected['global']):
-                valid.append(path)
+                valid.append(obj)
     return valid
 
 
 
 def get_fresh_pdfs(pin_count, quota):
-    folder = 'data/pdfs/{}'.format(pin_count)
-    if os.path.exists(folder):
-        paths = map(lambda p: '{}/{}'.format(folder, p), os.listdir(folder))
-    else:
-        paths = []
-    valid = get_valid(pin_count, paths)
+    valid = []
     i = 0
     while len(valid) < quota:
-        paths = octopart.get_pdfs(pin_count, i)
+        parts = octopart.get_pdfs(pin_count, i)
         i += 1
-        valid.extend(get_valid(pin_count, paths))
+        valid.extend(get_valid(pin_count, parts))
     return valid
 
 
 
 def run(pin_count, quota):
-    paths = get_fresh_pdfs(pin_count, quota)
-    for pdf_path in paths[0:quota]:
+    parts = get_fresh_pdfs(pin_count, quota)
+    for obj in parts[0:quota]:
+        pdf_path = obj['path']
         uid = path_to_uid(pdf_path)
         evince = sp.Popen(['evince', pdf_path], stdout=sp.PIPE, stderr=sp.STDOUT)
 
@@ -76,7 +73,7 @@ def run(pin_count, quota):
             evince.kill()
 
         try:
-            c = raw_input('{}> '.format(uid))
+            c = raw_input('{}> '.format(obj['mpn']))
         except EOFError:
             c = 'e'
 
@@ -101,4 +98,4 @@ def run(pin_count, quota):
 
 
 
-run(4, quota=1)
+run(int(sys.argv[1]), int(sys.argv[2]))
