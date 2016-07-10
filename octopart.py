@@ -19,7 +19,7 @@ def get_100_pdfs(prefix, pin_count, offset=0):
     data = urllib.urlopen(url).read()
     response = json.loads(data)
 
-    uids = []
+    paths = []
     for result in response['results']:
         part = result['item']
         sheets = part['datasheets']
@@ -37,15 +37,13 @@ def get_100_pdfs(prefix, pin_count, offset=0):
                     data = urllib.urlopen(url).read()
                     with open(path, 'w') as outfile:
                         outfile.write(data)
-                uids.append(uid)
-    return uids
+                paths.append(path)
+    return paths
 
 
 
-def get_pdfs(prefix, pin_count, n=1):
-    uids = []
-    utils.makedir('data/{}/{}'.format(prefix, pin_count))
-    for i in range(0, n):
-        uids.extend(get_100_pdfs(prefix, pin_count, i))
-        time.sleep(0.33)
-    return uids
+def get_pdfs(pin_count, i):
+    utils.makedir('data/pdfs/{}'.format(pin_count))
+    paths = get_100_pdfs('pdfs', pin_count, i)
+    time.sleep(0.33)
+    return paths
