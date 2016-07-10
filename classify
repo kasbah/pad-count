@@ -45,27 +45,29 @@ def uid_to_image(pin_count, uid):
     return 'data/training/{}/{}.png'.format(pin_count, uid)
 
 
-def get_valid(pin_count, parts):
-    valid = []
+def get_unchecked(pin_count, parts):
+    unchecked = []
     for obj in parts:
         path = obj['path']
         uid = path_to_uid(path)
         if not os.path.exists(uid_to_image(pin_count, uid)):
             sha = sp.check_output(['sha1sum', path]).split(' ')[0]
             if (sha not in rejected[pin_count]) and (sha not in rejected['global']):
-                valid.append(obj)
-    return valid
+                unchecked.append(obj)
+    return unchecked
 
 
 
 def get_fresh_pdfs(pin_count, quota):
-    valid = []
+    unchecked = []
     i = 0
-    while len(valid) < quota:
+    while len(unchecked) < quota:
+        print('Have {} unchecked pdfs, connecting to Octopart'.format(len(unchecked)))
         parts = octopart.get_pdfs(pin_count, i)
         i += 1
-        valid.extend(get_valid(pin_count, parts))
-    return valid
+        unchecked.extend(get_unchecked(pin_count, parts))
+        print('{} unchecked pdfs prepared'.format(len(unchecked)))
+    return unchecked
 
 
 
