@@ -10,6 +10,7 @@ def get_100_pdfs(prefix, pin_count, offset=0):
     url = 'https://octopart.com/api/v3/parts/search?'
     url += '&q='
     url += '&filter[fields][specs.pin_count.value][]={}'.format(pin_count)
+    url += '&filter[fields][specs.mounting_style.value][]=Surface Mount'
     url += '&start={}'.format(offset * 100)
     url += '&limit=100'
     url += '&apikey={}'.format(apikey)
