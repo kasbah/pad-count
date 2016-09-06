@@ -4,6 +4,8 @@ import os
 import time
 
 import utils
+
+#to use this, make an apikey.py file with apikey variable assigned to your octopart apikey
 from apikey import apikey
 
 def get_100_pdfs(prefix, pin_count, offset=0):
